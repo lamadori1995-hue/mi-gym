@@ -268,9 +268,9 @@ const EX={
   back:'La clave es que la zona lumbar no se despegue del piso en ningún momento.'}
 };
 const DAYS={
- A:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','femoral','plancha']},
+ A:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','laterales','femoral','plancha']},
  B:{focus:'Goblet · Polea al pecho · Hip thrust',ex:['goblet','jalon','inclinado','hipthrust','laterales','biceps','triceps','lateral_plank']},
- C:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','facepull','gemelos','deadbug']}
+ C:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','femoral','facepull','gemelos','deadbug']}
 };
 const WARMUP=['5 min de bici o cinta suave','Gato-camello: 8 repeticiones lentas','Bird dog: 2 × 6 por lado, aguantando 5 s','Puente de glúteos: 2 × 12'];
 
@@ -385,7 +385,9 @@ function nextDay(){const l=S.sessions[S.sessions.length-1];if(!l)return 'A';retu
 function curDay(){return S.day||nextDay()}
 function lastFor(id){for(let i=S.sessions.length-1;i>=0;i--){const s=S.sessions[i].ex[id];if(s&&s.length)return {d:S.sessions[i].d,sets:s}}return null}
 function draft(day){
-  if(!S.drafts[day]){const sets={};DAYS[day].ex.forEach(id=>{sets[id]=Array.from({length:setsOf(id)},()=>({kg:'',reps:'',done:false}))});S.drafts[day]={sets}}
+  if(!S.drafts[day])S.drafts[day]={sets:{}};
+  const sets=S.drafts[day].sets;
+  DAYS[day].ex.forEach(id=>{if(!sets[id])sets[id]=Array.from({length:setsOf(id)},()=>({kg:'',reps:'',done:false}))});
   return S.drafts[day];
 }
 function suggestion(id){
@@ -503,7 +505,7 @@ function renderProgress(){
     <form id="wform" class="form"><label>Fecha<input type="date" id="wd" value="${today()}"></label>
       <label>Peso (kg)<input id="wkg" inputmode="decimal" placeholder="${cur?nf(cur.kg,1):'75'}"></label>
       <button class="btn primary full" type="submit">Guardar peso</button></form>
-    <p class="fine">Para ganar músculo sin sumar mucha grasa, lo ideal es subir unos 0,25–0,5 kg por mes.</p></section>
+    <p class="fine">En tu nivel, lo razonable es subir entre 0,5 y 1 kg por mes. Si subís más rápido, probablemente sea grasa: bajá unas 150 kcal en Perfil.</p></section>
   <section class="panel"><div class="row"><h2 class="grow">Entrenamientos</h2><span class="pill">${wk}/3 esta semana</span></div>
     <div class="list">${S.sessions.length?S.sessions.slice(-8).reverse().map(s=>{
       let n=0,v=0;for(const id in s.ex)s.ex[id].forEach(st=>{n++;if(!EX[id].time)v+=(+st.kg||0)*(+st.reps||0)});
