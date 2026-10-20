@@ -103,6 +103,7 @@ dialog#sheet::backdrop{background:rgba(0,0,0,.55)}
 .rx strong{color:var(--ink);font-weight:600}
 .last{font-size:13px;background:var(--sunk);border-radius:8px;padding:7px 10px;display:flex;flex-direction:column;gap:2px}
 .last .up{color:var(--good);font-weight:600}
+.ex .swap{border-top:1px solid var(--line);padding-top:10px;font-size:13px}
 .sets{display:flex;flex-direction:column;gap:6px}
 .set{display:grid;grid-template-columns:54px 1fr 1fr 48px;gap:8px;align-items:center}
 .set.time{grid-template-columns:54px 1fr 48px}
@@ -182,95 +183,168 @@ nav.tabs button.on svg{stroke:var(--accent-text)}
 <script>
 /* ---------- Ejercicios (elegidos para cuidar la zona lumbar) ---------- */
 const EX={
- prensa:{n:'Prensa de piernas 45°',m:'Cuádriceps y glúteos',r:'10–12',top:12,rest:90,q:'prensa de piernas 45 grados técnica correcta',
+ prensa:{alt:['goblet','split'],n:'Prensa de piernas 45°',m:'Cuádriceps y glúteos',r:'10–12',top:12,rest:90,q:'prensa de piernas 45 grados técnica correcta',
   steps:['Sentate con la espalda y la cola bien apoyadas en el respaldo.','Pies a lo ancho de los hombros, en el centro de la plataforma.','Bajá controlado hasta que las rodillas formen unos 90°.','Empujá con todo el pie, sin trabar las rodillas arriba.'],
   err:['Bajar tanto que la cola se despega del asiento.','Trabar las rodillas al estirar.'],
   back:'Bajá solo hasta donde la cola sigue pegada al asiento. Si se despega, la lumbar se redondea con carga.'},
- banca:{n:'Press de banca con mancuernas',m:'Pecho, hombros y tríceps',r:'8–10',top:10,rest:90,q:'press banca con mancuernas técnica',
+ banca:{alt:['press_maquina','inclinado'],n:'Press de banca con mancuernas',m:'Pecho, hombros y tríceps',r:'8–10',top:10,rest:90,q:'press banca con mancuernas técnica',
   steps:['Acostate en el banco con los pies firmes en el piso y los omóplatos juntos.','Mancuernas a la altura del pecho, codos a unos 45° del cuerpo.','Empujá hacia arriba hasta casi juntarlas.','Bajá en 2–3 segundos.'],
   err:['Abrir los codos a 90° (carga el hombro).','Arquear mucho la espalda para empujar más.'],
   back:'Mantené un arco natural leve. Si molesta, apoyá los pies sobre el banco.'},
- remo_apoyado:{n:'Remo con pecho apoyado',m:'Espalda media y dorsales',r:'10',top:10,rest:90,q:'remo con mancuernas pecho apoyado banco inclinado',
+ remo_apoyado:{alt:['remo_polea','remo_unilateral'],n:'Remo con pecho apoyado',m:'Espalda media y dorsales',r:'10',top:10,rest:90,q:'remo con mancuernas pecho apoyado banco inclinado',
   steps:['Banco inclinado a 30–45°, acostate boca abajo con el pecho apoyado.','Brazos colgando con una mancuerna en cada mano.','Llevá los codos hacia atrás, cerca del cuerpo, juntando los omóplatos.','Bajá controlado.'],
   err:['Despegar el pecho del banco para tirar con impulso.','Subir los hombros hacia las orejas.'],
   back:'Con el pecho apoyado la lumbar no carga nada. Es el mejor remo para vos.'},
- hombro:{n:'Press de hombros sentado',m:'Hombros y tríceps',r:'10',top:10,rest:75,q:'press militar sentado con mancuernas técnica',
+ hombro:{alt:['hombro_maquina','arnold'],n:'Press de hombros sentado',m:'Hombros y tríceps',r:'10',top:10,rest:75,q:'press militar sentado con mancuernas técnica',
   steps:['Banco casi vertical con respaldo.','Mancuernas a la altura de las orejas, palmas hacia adelante.','Empujá hacia arriba sin chocarlas.','Bajá controlado hasta la altura de las orejas.'],
   err:['Despegar la espalda del respaldo y arquearla.','Bajar demasiado rápido.'],
   back:'Espalda pegada al respaldo y abdomen firme. No lo hagas de pie.'},
- femoral:{n:'Curl femoral sentado',m:'Isquiotibiales',r:'12',top:12,rest:60,q:'curl femoral sentado máquina técnica',
+ femoral:{alt:['femoral_acostado','puente'],n:'Curl femoral sentado',m:'Isquiotibiales',r:'12',top:12,rest:60,q:'curl femoral sentado máquina técnica',
   steps:['Ajustá la máquina para que la rodilla quede alineada con el eje.','La almohadilla va sobre los tobillos y la traba sobre los muslos.','Llevá los talones hacia abajo y atrás.','Volvé lento.'],
   err:['Levantar la cadera del asiento.','Usar impulso.'],
   back:'La versión sentada es más amable con la lumbar que la acostada. Si solo hay acostada, no levantes la cadera.'},
- plancha:{n:'Plancha frontal',m:'Abdomen (zona media)',r:'30 s',time:30,rest:45,q:'plancha abdominal técnica correcta',
+ plancha:{alt:['birddog','pallof','deadbug'],n:'Plancha frontal',m:'Abdomen (zona media)',r:'30 s',time:30,rest:45,q:'plancha abdominal técnica correcta',
   steps:['Antebrazos en el piso, codos debajo de los hombros.','Cuerpo recto de la cabeza a los talones.','Apretá glúteos y abdomen.','Respirá normal, sin aguantar el aire.'],
   err:['Dejar que se hunda la cadera.','Subir mucho la cola.'],
   back:'Si sentís la lumbar, apoyá las rodillas o acortá el tiempo. Importa más la postura que la duración.'},
- goblet:{n:'Sentadilla goblet',m:'Cuádriceps y glúteos',r:'10',top:10,rest:90,q:'sentadilla goblet técnica',
-  steps:['Sostené una mancuerna vertical pegada al pecho.','Pies un poco más anchos que los hombros, puntas apenas hacia afuera.','Bajá entre las piernas con el pecho arriba.','Subí empujando el piso con todo el pie.'],
+ goblet:{alt:['prensa','split'],n:'Sentadilla goblet',m:'Cuádriceps y glúteos',r:'10–12',top:12,rest:90,sets:4,q:'sentadilla goblet técnica',
+  steps:['Sostené una mancuerna vertical pegada al pecho.','Pies un poco más anchos que los hombros, puntas apenas hacia afuera.','Bajá en 3 segundos entre las piernas, con el pecho arriba, y pausá 1 segundo abajo.','Subí empujando el piso con todo el pie.'],
   err:['Despegar los talones.','Redondear la espalda abajo del todo.'],
-  back:'Bajá solo hasta donde la espalda sigue recta. La mancuerna adelante carga menos la lumbar que una barra.'},
- jalon:{n:'Polea al pecho',m:'Dorsales y bíceps',r:'10',top:10,rest:90,q:'polea al pecho técnica dorsales',
+  back:'Bajá solo hasta donde la espalda sigue recta. La mancuerna adelante carga menos la lumbar que una barra. Si la mancuerna más pesada ya te queda liviana, cambiá a la prensa.'},
+ jalon:{alt:['jalon_neutro','asistidas'],n:'Polea al pecho',m:'Dorsales y bíceps',r:'8–10',top:10,rest:90,sets:4,q:'polea al pecho técnica dorsales',
   steps:['Trabá los muslos bajo las almohadillas.','Agarre un poco más ancho que los hombros.','Llevá la barra a la parte alta del pecho bajando los codos.','Subí controlado.'],
   err:['Tirarte para atrás con impulso.','Bajar la barra por detrás de la nuca.'],
   back:'Inclinación leve hacia atrás y sin balanceo.'},
- inclinado:{n:'Press inclinado con mancuernas',m:'Pecho alto y hombros',r:'10',top:10,rest:90,q:'press inclinado con mancuernas técnica',
+ inclinado:{alt:['banca','press_maquina'],n:'Press inclinado con mancuernas',m:'Pecho alto y hombros',r:'8–10',top:10,rest:90,sets:4,q:'press inclinado con mancuernas técnica',
   steps:['Banco a unos 30°.','Pies firmes, omóplatos juntos.','Empujá las mancuernas hacia arriba, en línea con la parte alta del pecho.','Bajá en 2–3 segundos.'],
   err:['Banco demasiado vertical (se vuelve press de hombros).','Rebotar abajo.'],
   back:'La cola queda apoyada en el banco todo el tiempo.'},
- hipthrust:{n:'Hip thrust',m:'Glúteos',r:'10–12',top:12,rest:75,q:'hip thrust técnica correcta',
+ hipthrust:{alt:['puente','patada_polea'],n:'Hip thrust',m:'Glúteos',r:'10–12',top:12,rest:75,q:'hip thrust técnica correcta',
   steps:['Apoyá la espalda alta en el borde de un banco.','Barra o mancuerna sobre la cadera, con almohadilla.','Empujá con los talones hasta que la cadera quede alineada con el torso.','Apretá los glúteos 1 segundo arriba y bajá.'],
   err:['Arquear la lumbar arriba en lugar de extender la cadera.','Mirar al techo.'],
   back:'Arriba, mentón hacia el pecho y costillas abajo. Unos glúteos fuertes ayudan mucho con el dolor lumbar.'},
- laterales:{n:'Elevaciones laterales',m:'Hombro lateral',r:'12–15',top:15,rest:60,q:'elevaciones laterales con mancuernas técnica',
+ laterales:{alt:['laterales_polea'],n:'Elevaciones laterales',m:'Hombro lateral',r:'12–15',top:15,rest:60,q:'elevaciones laterales con mancuernas técnica',
   steps:['De pie o sentado, codos apenas flexionados.','Subí los brazos hacia los costados hasta la altura de los hombros.','Bajá lento.'],
   err:['Balancear el cuerpo para subir.','Subir por encima de los hombros.'],
   back:'Si de pie te molesta, hacelas sentado.'},
- biceps:{n:'Curl de bíceps con mancuernas',m:'Bíceps',r:'12',top:12,rest:60,sets:2,q:'curl de bíceps con mancuernas técnica',
+ biceps:{alt:['martillo','curl_polea'],n:'Curl de bíceps con mancuernas',m:'Bíceps',r:'10–12',top:12,rest:60,q:'curl de bíceps con mancuernas técnica',
   steps:['Codos pegados al cuerpo.','Subí girando la palma hacia arriba.','Bajá en 2 segundos hasta estirar el brazo.'],
   err:['Mover los codos hacia adelante.','Tirar el torso hacia atrás.'],
   back:'Sentado en un banco con respaldo la espalda queda quieta.'},
- triceps:{n:'Extensión de tríceps en polea',m:'Tríceps',r:'12',top:12,rest:60,sets:2,q:'extensión de tríceps en polea con soga',
+ triceps:{alt:['frances','press_cerrado'],n:'Extensión de tríceps en polea',m:'Tríceps',r:'10–12',top:12,rest:60,q:'extensión de tríceps en polea con soga',
   steps:['De pie frente a la polea alta, con soga o barra.','Codos pegados a los costados.','Estirá los brazos hacia abajo y volvé hasta 90°.'],
   err:['Mover los codos.','Inclinarse encima del peso.'],
   back:'Pararte con un pie adelante te da estabilidad sin arquear la espalda.'},
- lateral_plank:{n:'Plancha lateral',m:'Oblicuos y zona media',r:'20 s por lado',time:20,rest:45,q:'plancha lateral técnica McGill',
+ lateral_plank:{alt:['plancha','birddog','pallof'],n:'Plancha lateral',m:'Oblicuos y zona media',r:'30 s por lado',time:30,rest:45,q:'plancha lateral técnica McGill',
   steps:['Apoyá el antebrazo con el codo debajo del hombro.','Cuerpo recto, cadera arriba.','Aguantá y después cambiá de lado.'],
   err:['Dejar caer la cadera.','Girar el torso hacia el piso.'],
   back:'Es uno de los tres ejercicios de McGill para la espalda. Versión fácil: con las rodillas apoyadas.'},
- split:{n:'Estocada fija con mancuernas',m:'Cuádriceps y glúteos',r:'8 por pierna',top:8,rest:90,q:'split squat con mancuernas técnica',
+ split:{alt:['goblet','prensa'],n:'Estocada fija con mancuernas',m:'Cuádriceps y glúteos',r:'8 por pierna',top:8,rest:90,q:'split squat con mancuernas técnica',
   steps:['Un pie adelante y otro atrás, como una estocada pero sin moverte.','Mancuernas a los costados.','Bajá la rodilla de atrás casi hasta el piso, con el torso recto.','Subí empujando con el pie de adelante.'],
   err:['Rodilla de adelante que se va hacia adentro.','Paso demasiado corto.'],
   back:'Con el torso vertical y las mancuernas a los costados, la columna carga mucho menos que con barra. Agarrate de algo si te falta equilibrio.'},
- remo_polea:{n:'Remo en polea baja',m:'Espalda media',r:'10',top:10,rest:90,q:'remo en polea baja sentado técnica',
+ remo_polea:{alt:['remo_apoyado','remo_unilateral'],n:'Remo en polea baja',m:'Espalda media',r:'10',top:10,rest:90,q:'remo en polea baja sentado técnica',
   steps:['Sentado, pies apoyados y rodillas apenas flexionadas.','Torso firme y quieto.','Llevá el agarre hacia el abdomen juntando los omóplatos.','Volvé controlado.'],
   err:['Balancear el torso adelante y atrás.','Redondear la espalda al estirar.'],
   back:'El torso no se mueve: solo trabajan los brazos y los omóplatos.'},
- press_maquina:{n:'Press de pecho en máquina',m:'Pecho y tríceps',r:'10',top:10,rest:75,q:'press de pecho en máquina técnica',
+ press_maquina:{alt:['banca','inclinado'],n:'Press de pecho en máquina',m:'Pecho y tríceps',r:'10',top:10,rest:75,q:'press de pecho en máquina técnica',
   steps:['Ajustá el asiento para que los agarres queden a la altura del pecho.','Espalda apoyada en el respaldo.','Empujá sin trabar los codos y volvé lento.'],
   err:['Despegar la espalda.','Asiento muy alto o muy bajo.'],
   back:'La máquina te da estabilidad. Espalda siempre contra el respaldo.'},
- cuadriceps:{n:'Sillón de cuádriceps',m:'Cuádriceps',r:'12',top:12,rest:60,q:'extensión de cuádriceps máquina técnica',
+ cuadriceps:{alt:['prensa','goblet'],n:'Sillón de cuádriceps',m:'Cuádriceps',r:'12',top:12,rest:60,q:'extensión de cuádriceps máquina técnica',
   steps:['Rodilla alineada con el eje de la máquina.','Estirá las piernas y apretá 1 segundo arriba.','Bajá en 2–3 segundos.'],
   err:['Usar impulso.','Despegar la cola del asiento.'],
   back:'Sin carga en la columna. Agarrate de las manijas.'},
- facepull:{n:'Face pull',m:'Hombro posterior y postura',r:'15',top:15,rest:60,q:'face pull con soga técnica',
+ facepull:{alt:['posterior_polea'],n:'Face pull',m:'Hombro posterior y postura',r:'15',top:15,rest:60,q:'face pull con soga técnica',
   steps:['Polea a la altura de la cara, con soga.','Tirá hacia la frente abriendo la soga, con los codos altos.','Pausa de 1 segundo y volvé.'],
   err:['Tirar con la espalda baja.','Usar demasiado peso.'],
   back:'Peso liviano, cuerpo quieto. Ayuda a la postura de la espalda alta.'},
- gemelos:{n:'Gemelos sentado',m:'Gemelos y sóleo',r:'15',top:15,rest:45,q:'elevación de talones sentado máquina',
+ gemelos:{alt:['gemelos_prensa','gemelos_pie'],n:'Gemelos sentado',m:'Gemelos y sóleo',r:'15',top:15,rest:45,q:'elevación de talones sentado máquina',
   steps:['Sentado en la máquina con las almohadillas sobre las rodillas.','Bajá los talones todo lo que puedas.','Subí bien arriba y pausá 1 segundo.'],
   err:['Rebotar abajo.','Hacer recorridos cortos.'],
   back:'La versión sentada no carga la columna.'},
- deadbug:{n:'Dead bug (bicho muerto)',m:'Abdomen profundo',r:'8 por lado',top:8,rest:45,q:'dead bug ejercicio técnica',
+ deadbug:{alt:['birddog','pallof','plancha'],n:'Dead bug (bicho muerto)',m:'Abdomen profundo',r:'8 por lado',top:8,rest:45,q:'dead bug ejercicio técnica',
   steps:['Boca arriba, brazos hacia el techo y rodillas a 90°.','Bajá lentamente un brazo y la pierna contraria.','Volvé y cambiá de lado.'],
   err:['Despegar la lumbar del piso.','Hacerlo rápido.'],
-  back:'La clave es que la zona lumbar no se despegue del piso en ningún momento.'}
+  back:'La clave es que la zona lumbar no se despegue del piso en ningún momento.'},
+ /* alternativas (fig = reusa el dibujo de otro ejercicio) */
+ remo_unilateral:{alt:['remo_apoyado','remo_polea'],n:'Remo a un brazo con mancuerna',m:'Dorsales y espalda media',r:'10 por brazo',top:10,rest:75,q:'remo a una mano con mancuerna apoyado en banco técnica',
+  steps:['Apoyá en el banco la rodilla y la mano del mismo lado.','El otro pie en el piso, con la espalda recta y paralela al piso.','Llevá la mancuerna hacia la cadera con el codo pegado al cuerpo.','Bajá lento hasta estirar el brazo. Hacé todas las de un lado y cambiá.'],
+  err:['Girar el torso para subir la mancuerna.','Redondear la espalda.'],
+  back:'Con la mano apoyada, el banco sostiene tu espalda. Si igual molesta, cambiá al remo con pecho apoyado.'},
+ jalon_neutro:{n:'Polea al pecho agarre cerrado',fig:'jalon',m:'Dorsales y bíceps',r:'8–10',top:10,rest:90,sets:4,q:'jalón al pecho agarre neutro cerrado técnica',
+  steps:['Usá el agarre en V (triángulo), con las palmas enfrentadas.','Trabá los muslos bajo las almohadillas.','Llevá el agarre a la parte alta del pecho bajando los codos pegados al cuerpo.','Subí controlado hasta estirar los brazos.'],
+  err:['Tirarte para atrás con impulso.','Cortar el recorrido arriba.'],
+  back:'Torso apenas inclinado y quieto, sin balanceo.'},
+ asistidas:{n:'Dominadas asistidas en máquina',m:'Dorsales y bíceps',r:'8–10',top:10,rest:90,sets:4,q:'dominadas asistidas en máquina técnica',
+  steps:['Elegí el contrapeso: cuanto más peso ponés, más te ayuda la máquina. Anotá ese número: progresar es ir bajándolo.','Apoyá las rodillas en la plataforma y agarrá la barra un poco más ancho que los hombros.','Subí hasta que el mentón pase la barra, llevando los codos hacia abajo.','Bajá lento hasta estirar los brazos.'],
+  err:['Subir con impulso de piernas.','Bajar de golpe.'],
+  back:'Colgado, la columna se descomprime. Abdomen firme para no arquear la espalda.'},
+ puente:{n:'Puente de glúteos con peso',m:'Glúteos',r:'12–15',top:15,rest:60,q:'puente de glúteos con peso en el piso técnica',
+  steps:['Acostate boca arriba con las rodillas flexionadas y los pies apoyados.','Mancuerna o disco sobre la cadera.','Empujá con los talones y subí la cadera hasta alinearla con el torso.','Apretá los glúteos 1 segundo arriba y bajá lento.'],
+  err:['Arquear la lumbar arriba.','Empujar con las puntas de los pies.'],
+  back:'Arriba, costillas abajo: el que tiene que trabajar es el glúteo, no la lumbar.'},
+ patada_polea:{n:'Patada de glúteo en polea',m:'Glúteos',r:'12 por pierna',top:12,rest:60,q:'patada de glúteo en polea con tobillera técnica',
+  steps:['Enganchá una tobillera a la polea baja.','Agarrate de la máquina con el torso apenas inclinado.','Llevá la pierna hacia atrás apretando el glúteo, sin girar la cadera.','Volvé lento. Hacé todas con una pierna y cambiá.'],
+  err:['Arquear la espalda para llevar la pierna más arriba.','Usar impulso.'],
+  back:'Recorrido corto y controlado: si la espalda empieza a arquearse, frená ahí.'},
+ laterales_polea:{n:'Elevación lateral en polea',m:'Hombro lateral',r:'12–15 por brazo',top:15,rest:60,q:'elevación lateral en polea baja a un brazo',
+  steps:['Polea baja. Parate de costado, con la máquina del lado contrario al brazo que trabaja.','Agarrá el estribo cruzando por delante del cuerpo.','Subí el brazo hacia el costado hasta la altura del hombro.','Bajá lento. Hacé todas con un brazo y cambiá.'],
+  err:['Inclinar el torso para ayudarte.','Subir por encima del hombro.'],
+  back:'Agarrate de la máquina con la otra mano y el cuerpo queda quieto.'},
+ hombro_maquina:{n:'Press de hombros en máquina',fig:'hombro',m:'Hombros y tríceps',r:'10',top:10,rest:75,q:'press de hombros en máquina técnica',
+  steps:['Ajustá el asiento para que los agarres queden a la altura de los hombros.','Espalda bien apoyada en el respaldo.','Empujá hacia arriba sin trabar los codos.','Bajá controlado.'],
+  err:['Despegar la espalda del respaldo.','Asiento demasiado bajo.'],
+  back:'La máquina marca el recorrido y la espalda queda quieta. Muy buena opción para vos.'},
+ arnold:{n:'Press Arnold sentado',fig:'hombro',m:'Hombros completos',r:'10',top:10,rest:75,q:'press arnold sentado técnica',
+  steps:['Banco casi vertical con respaldo.','Empezá con las mancuernas frente a la cara y las palmas mirándote.','Mientras empujás hacia arriba, girá las palmas hacia adelante.','Bajá deshaciendo el giro.'],
+  err:['Arquear la espalda.','Hacerlo rápido.'],
+  back:'Igual que en el press de hombros: espalda pegada al respaldo.'},
+ martillo:{n:'Curl martillo',fig:'biceps',m:'Bíceps y antebrazo',r:'10–12',top:12,rest:60,q:'curl martillo con mancuernas técnica',
+  steps:['Mancuernas con las palmas enfrentadas, como si sostuvieras un martillo.','Codos pegados al cuerpo.','Subí sin girar la muñeca.','Bajá en 2 segundos.'],
+  err:['Balancear el cuerpo.','Mover los codos hacia adelante.'],
+  back:'Sentado en un banco con respaldo la espalda queda quieta.'},
+ curl_polea:{n:'Curl de bíceps en polea',m:'Bíceps',r:'10–12',top:12,rest:60,q:'curl de bíceps en polea baja técnica',
+  steps:['Polea baja con barra o soga.','Parate cerca de la máquina, con los codos pegados al cuerpo.','Subí hasta el pecho sin mover los codos.','Bajá lento: la polea mantiene la tensión en todo el recorrido.'],
+  err:['Inclinarte hacia atrás.','Despegar los codos.'],
+  back:'Con un pie un poco adelante tenés estabilidad sin arquear la espalda.'},
+ frances:{n:'Extensión de tríceps sobre la cabeza',m:'Tríceps',r:'10–12',top:12,rest:60,q:'extensión de tríceps con mancuerna sentado sobre la cabeza',
+  steps:['Sentado en un banco con respaldo, agarrá una mancuerna con las dos manos.','Subila por encima de la cabeza.','Bajala por detrás de la cabeza doblando solo los codos.','Volvé a estirar los brazos.'],
+  err:['Abrir mucho los codos.','Arquear la espalda.'],
+  back:'Sentado con respaldo y el abdomen firme. No lo hagas de pie.'},
+ press_cerrado:{n:'Press cerrado con mancuernas',fig:'banca',m:'Tríceps y pecho',r:'10–12',top:12,rest:60,q:'press cerrado con mancuernas para tríceps',
+  steps:['Acostado en el banco, con las mancuernas juntas y las palmas enfrentadas.','Codos pegados al cuerpo.','Empujá hacia arriba hasta estirar los brazos.','Bajá lento hasta el pecho.'],
+  err:['Abrir los codos.','Rebotar en el pecho.'],
+  back:'Pies firmes en el piso, o arriba del banco si te molesta la espalda.'},
+ femoral_acostado:{n:'Curl femoral acostado',m:'Isquiotibiales',r:'10–12',top:12,rest:60,q:'curl femoral acostado máquina técnica',
+  steps:['Acostate boca abajo, con las rodillas justo afuera del borde del banco.','La almohadilla va sobre los talones.','Llevá los talones hacia la cola.','Bajá lento.'],
+  err:['Levantar la cadera del banco.','Usar impulso.'],
+  back:'Apretá la cadera contra el banco todo el tiempo: si se levanta, la lumbar se arquea. Si hay máquina sentada, es mejor esa.'},
+ birddog:{n:'Bird dog (perro de caza)',m:'Zona media y lumbar',r:'6 por lado · 8 s',top:6,rest:45,q:'bird dog McGill técnica',
+  steps:['En cuatro patas: manos debajo de los hombros y rodillas debajo de la cadera.','Estirá un brazo hacia adelante y la pierna contraria hacia atrás.','Aguantá 8 segundos con la espalda quieta, como una mesa.','Volvé y cambiá de lado.'],
+  err:['Subir demasiado la pierna y arquear.','Girar la cadera.'],
+  back:'Es otro de los tres ejercicios de McGill. Imaginá un vaso de agua sobre la espalda que no se tiene que caer.'},
+ pallof:{n:'Press Pallof',m:'Zona media (antirrotación)',r:'10 por lado',top:10,rest:45,q:'press pallof en polea técnica',
+  steps:['Polea a la altura del pecho. Parate de costado a la máquina.','Agarrá el estribo con las dos manos contra el pecho.','Estirá los brazos hacia adelante sin dejar que la polea te gire.','Aguantá 2 segundos y volvé. Después, del otro lado.'],
+  err:['Girar el torso hacia la máquina.','Pararte demasiado cerca: así la polea no tira.'],
+  back:'La columna no se mueve: el abdomen trabaja para que no gire. Ideal para tu espalda.'},
+ posterior_polea:{n:'Vuelos posteriores en polea',m:'Hombro posterior y postura',r:'15',top:15,rest:60,q:'vuelos posteriores en polea cruzada de pie',
+  steps:['Las dos poleas a la altura de los hombros, sin estribo: agarrá el cable.','Cruzalos: la mano derecha agarra el de la izquierda y al revés.','Abrí los brazos hacia los costados y atrás, con los codos apenas flexionados.','Volvé lento.'],
+  err:['Usar demasiado peso.','Arquear la espalda.'],
+  back:'Parado derecho y con peso liviano. La máquina de vuelos invertidos (peck deck al revés) también sirve.'},
+ gemelos_prensa:{n:'Gemelos en prensa',m:'Gemelos',r:'15',top:15,rest:45,q:'gemelos en prensa de piernas técnica',
+  steps:['Sentado en la prensa, apoyá solo las puntas de los pies en el borde de abajo de la plataforma. Dejá puestos los seguros.','Piernas estiradas pero sin trabar las rodillas.','Empujá con las puntas lo más lejos que puedas.','Volvé lento, estirando bien los gemelos.'],
+  err:['Doblar las rodillas para empujar.','Hacer recorridos cortos.'],
+  back:'Espalda y cola apoyadas en el respaldo: la columna no carga.'},
+ gemelos_pie:{n:'Gemelos de pie a una pierna',m:'Gemelos',r:'12 por pierna',top:12,rest:45,q:'elevación de talones a una pierna en escalón',
+  steps:['Parate con la punta de un pie en el borde de un escalón o un disco.','Agarrate de algo con una mano y sostené una mancuerna con la otra.','Subí bien alto y pausá 1 segundo.','Bajá el talón por debajo del escalón. Hacé todas y cambiá de pierna.'],
+  err:['Rebotar abajo.','Doblar la rodilla.'],
+  back:'Con una sola mancuerna y la mano apoyada, la columna casi no carga.'}
 };
 const DAYS={
- A:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','laterales','femoral','plancha']},
- B:{focus:'Goblet · Polea al pecho · Hip thrust',ex:['goblet','jalon','inclinado','hipthrust','laterales','biceps','triceps','lateral_plank']},
- C:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','femoral','facepull','gemelos','deadbug']}
+ 1:{focus:'Goblet · Polea al pecho · Hip thrust',ex:['goblet','jalon','inclinado','remo_unilateral','hipthrust','laterales','biceps','triceps','lateral_plank']},
+ 2:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','laterales','femoral','plancha']},
+ 3:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','femoral','facepull','gemelos','deadbug']}
 };
 const WARMUP=['5 min de bici o cinta suave','Gato-camello: 8 repeticiones lentas','Bird dog: 2 × 6 por lado, aguantando 5 s','Puente de glúteos: 2 × 12'];
 
@@ -327,10 +401,17 @@ const MEALS={
 /* ---------- Estado ---------- */
 const KEY='mi-gym-v1';
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-const defaults=()=>({profile:{age:30,sex:'m',weight:75,height:174,goal:'musculo',breakfast:true},v:2,
+const defaults=()=>({profile:{age:30,sex:'m',weight:75,height:174,goal:'musculo',breakfast:true},v:3,swap:{},
   weights:[{d:today(),kg:75}],sessions:[],drafts:{},pick:{desayuno:0,almuerzo:0,merienda:0,cena:1},tab:'entrenar',day:null});
 let S=defaults();
-try{const r=JSON.parse(localStorage.getItem(KEY));if(r)S=Object.assign(defaults(),r)}catch(e){}
+try{const r=JSON.parse(localStorage.getItem(KEY));if(r){S=Object.assign(defaults(),r);if((r.v||0)<3)migrate()}}catch(e){}
+function migrate(){ // los días A, B y C pasaron a llamarse 2, 1 y 3
+  const M={A:'2',B:'1',C:'3'},dr={};
+  S.sessions.forEach(s=>{if(M[s.day])s.day=M[s.day]});
+  for(const k in S.drafts)dr[M[k]||k]=S.drafts[k];
+  S.drafts=dr;if(S.day)S.day=M[S.day]||null;S.v=3;
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+}
 if(!S.v){S.profile.breakfast=true;S.v=2}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 
@@ -381,13 +462,20 @@ function qty(i){
 }
 
 /* ---------- Entrenamiento ---------- */
-function nextDay(){const l=S.sessions[S.sessions.length-1];if(!l)return 'A';return {A:'B',B:'C',C:'A'}[l.day]}
+function nextDay(){const l=S.sessions[S.sessions.length-1];if(!l)return '1';return {1:'2',2:'3',3:'1'}[l.day]||'1'}
+/* Cada lugar de la rutina tiene el ejercicio original y sus alternativas; S.swap guarda la elegida. */
+function optsFor(day,i){
+  const main=DAYS[day].ex[i],taken=exList(day,i);
+  return [main,...(EX[main].alt||[])].filter(x=>x===main||!taken.includes(x));
+}
+function exList(day,skip){return DAYS[day].ex.map((m,i)=>{if(i===skip)return null;const s=S.swap[day+'-'+i];return s&&EX[s]?s:m})}
+function curEx(day){return exList(day,-1)}
 function curDay(){return S.day||nextDay()}
 function lastFor(id){for(let i=S.sessions.length-1;i>=0;i--){const s=S.sessions[i].ex[id];if(s&&s.length)return {d:S.sessions[i].d,sets:s}}return null}
 function draft(day){
   if(!S.drafts[day])S.drafts[day]={sets:{}};
   const sets=S.drafts[day].sets;
-  DAYS[day].ex.forEach(id=>{if(!sets[id])sets[id]=Array.from({length:setsOf(id)},()=>({kg:'',reps:'',done:false}))});
+  curEx(day).forEach(id=>{if(!sets[id])sets[id]=Array.from({length:setsOf(id)},()=>({kg:'',reps:'',done:false}))});
   return S.drafts[day];
 }
 function suggestion(id){
@@ -415,24 +503,27 @@ function renderTrain(){
   const day=curDay(),d=draft(day),nd=nextDay();
   const anyDone=Object.values(d.sets).some(a=>a.some(s=>s.done));
   let h=`<header class="page"><span class="eyebrow">3 días por semana · cuerpo completo · cuidando la lumbar</span><h1>Entrenar</h1></header>
-  <div class="days" role="group" aria-label="Elegí el día">${['A','B','C'].map(k=>`<button class="day${k===day?' on':''}" data-day="${k}">
+  <div class="days" role="group" aria-label="Elegí el día">${['1','2','3'].map(k=>`<button class="day${k===day?' on':''}" data-day="${k}">
      <span class="tag">${k===nd?'Te toca':'&nbsp;'}</span><b>Día ${k}</b><span>${DAYS[k].focus}</span></button>`).join('')}</div>
   <details class="note"><summary>Reglas para tu espalda</summary><ul>
     <li>Molestia muscular está bien. Si sentís un dolor punzante en la columna, o que baja por la pierna, dejá ese ejercicio.</li>
     <li>Espalda siempre neutra: si para bajar más se te redondea la espalda, bajá menos.</li>
     <li>Las últimas 1–2 repeticiones tienen que costar, pero sin perder la técnica.</li>
+    <li>Si al terminar una serie sentís que te sobraban 4 repeticiones o más, el peso es poco: subilo en la serie siguiente, no esperes a la próxima semana.</li>
     <li>Por ahora evitá: peso muerto con barra, buenos días, sentadilla con barra pesada, remo con barra inclinado, abdominales tipo crunch y elevaciones de piernas colgado.</li>
     <li>Si el dolor sigue más de unas semanas, consultá con un kinesiólogo.</li></ul></details>
   <section><h2>Entrada en calor · 8 min</h2><div class="warm">${WARMUP.map((w,i)=>`<label><input type="checkbox" id="wu-${day}-${i}">${w}</label>`).join('')}</div></section>
   <section><h2>Ejercicios</h2>`;
-  DAYS[day].ex.forEach((id,n)=>{
-    const e=EX[id],sets=d.sets[id],sg=suggestion(id),all=sets.every(s=>s.done);
+  curEx(day).forEach((id,n)=>{
+    const e=EX[id],sets=d.sets[id],sg=suggestion(id),all=sets.every(s=>s.done),op=optsFor(day,n),main=DAYS[day].ex[n];
     h+=`<article class="ex${all?' done':''}" id="ex-${id}">
-      <button class="exhead" data-open="${id}" aria-label="Ver cómo se hace: ${e.n}"><canvas class="thumb" data-fig="${id}" aria-hidden="true"></canvas>
+      <button class="exhead" data-open="${id}" aria-label="Ver cómo se hace: ${e.n}"><canvas class="thumb" data-fig="${e.fig||id}" aria-hidden="true"></canvas>
         <span class="grow"><span class="eyebrow">${n+1} · ${e.m}</span><span class="exname">${e.n}</span>
         <span class="rx"><strong>${setsOf(id)} × ${e.r}</strong> · descanso ${e.rest} s</span><span class="see">Ver cómo se hace ›</span></span></button>
       ${sg?`<div class="last"><span>Última vez (${fmtD(sg.d)}): <span class="num">${sg.txt}</span></span>${sg.up?`<span class="up">${sg.up}</span>`:''}</div>`:''}
       <div class="sets">${sets.map((s,i)=>setRow(day,id,i,s)).join('')}</div>
+      ${op.length>1?`<div class="row swap"><span class="grow sub">${id===main?`${op.length-1} ${op.length>2?'alternativas':'alternativa'} si la máquina está ocupada`:`Alternativa ${op.indexOf(id)} de ${op.length-1} · original: ${EX[main].n}`}</span>
+        <button class="btn ghost" data-swapex="${n}">Otra opción</button></div>`:''}
       </article>`;
   });
   h+=`</section><div class="finish">
@@ -592,7 +683,7 @@ function openSheet(id){
   const e=EX[id];
   sheet.innerHTML=`<div class="in"><div class="top"><div><span class="eyebrow">${e.m}</span><h2>${e.n}</h2></div>
     <button class="x" data-close aria-label="Cerrar">×</button></div>
-    <canvas class="big" data-fig="${id}" aria-label="Animación del movimiento"></canvas>
+    <canvas class="big" data-fig="${e.fig||id}" aria-label="Animación del movimiento"></canvas>
     <p class="rx"><strong>${setsOf(id)} series × ${e.r}</strong> · descanso ${e.rest} s</p>
     <section><span class="eyebrow">Paso a paso</span><ol>${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol></section>
     <section><span class="eyebrow">Errores comunes</span><ul>${e.err.map(s=>`<li>${s}</li>`).join('')}</ul></section>
@@ -608,6 +699,10 @@ app.addEventListener('click',e=>{
   if(op){openSheet(op.dataset.open);return}
   const dayB=e.target.closest('[data-day]');
   if(dayB){S.day=dayB.dataset.day;save();render();return}
+  const sx=e.target.closest('[data-swapex]');
+  if(sx){const day=curDay(),i=+sx.dataset.swapex,op=optsFor(day,i),cur=curEx(day)[i],nx=op[(op.indexOf(cur)+1)%op.length];
+    if(nx===DAYS[day].ex[i])delete S.swap[day+'-'+i];else S.swap[day+'-'+i]=nx;save();render();
+    const el=document.getElementById('ex-'+nx);if(el)el.scrollIntoView({block:'nearest'});return}
   const sw=e.target.closest('[data-swap]');
   if(sw){const k=sw.dataset.swap;S.pick[k]=((S.pick[k]||0)+1)%MEALS[k].opts.length;save();render();return}
   const b=e.target.closest('[data-act]');if(!b)return;
