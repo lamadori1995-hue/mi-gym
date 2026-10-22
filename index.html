@@ -183,15 +183,15 @@ nav.tabs button.on svg{stroke:var(--accent-text)}
 <script>
 /* ---------- Ejercicios (elegidos para cuidar la zona lumbar) ---------- */
 const EX={
- prensa:{alt:['goblet','split'],n:'Prensa de piernas 45°',m:'Cuádriceps y glúteos',r:'10–12',top:12,rest:90,q:'prensa de piernas 45 grados técnica correcta',
+ prensa:{alt:['goblet','split'],n:'Prensa de piernas 45°',m:'Cuádriceps y glúteos',r:'10–12',top:12,rest:90,sets:4,q:'prensa de piernas 45 grados técnica correcta',
   steps:['Sentate con la espalda y la cola bien apoyadas en el respaldo.','Pies a lo ancho de los hombros, en el centro de la plataforma.','Bajá controlado hasta que las rodillas formen unos 90°.','Empujá con todo el pie, sin trabar las rodillas arriba.'],
   err:['Bajar tanto que la cola se despega del asiento.','Trabar las rodillas al estirar.'],
   back:'Bajá solo hasta donde la cola sigue pegada al asiento. Si se despega, la lumbar se redondea con carga.'},
- banca:{alt:['press_maquina','inclinado'],n:'Press de banca con mancuernas',m:'Pecho, hombros y tríceps',r:'8–10',top:10,rest:90,q:'press banca con mancuernas técnica',
+ banca:{alt:['press_maquina','inclinado'],n:'Press de banca con mancuernas',m:'Pecho, hombros y tríceps',r:'8–10',top:10,rest:90,sets:4,q:'press banca con mancuernas técnica',
   steps:['Acostate en el banco con los pies firmes en el piso y los omóplatos juntos.','Mancuernas a la altura del pecho, codos a unos 45° del cuerpo.','Empujá hacia arriba hasta casi juntarlas.','Bajá en 2–3 segundos.'],
   err:['Abrir los codos a 90° (carga el hombro).','Arquear mucho la espalda para empujar más.'],
   back:'Mantené un arco natural leve. Si molesta, apoyá los pies sobre el banco.'},
- remo_apoyado:{alt:['remo_polea','remo_unilateral'],n:'Remo con pecho apoyado',m:'Espalda media y dorsales',r:'10',top:10,rest:90,q:'remo con mancuernas pecho apoyado banco inclinado',
+ remo_apoyado:{alt:['remo_polea','remo_unilateral'],n:'Remo con pecho apoyado',m:'Espalda media y dorsales',r:'10',top:10,rest:90,sets:4,q:'remo con mancuernas pecho apoyado banco inclinado',
   steps:['Banco inclinado a 30–45°, acostate boca abajo con el pecho apoyado.','Brazos colgando con una mancuerna en cada mano.','Llevá los codos hacia atrás, cerca del cuerpo, juntando los omóplatos.','Bajá controlado.'],
   err:['Despegar el pecho del banco para tirar con impulso.','Subir los hombros hacia las orejas.'],
   back:'Con el pecho apoyado la lumbar no carga nada. Es el mejor remo para vos.'},
@@ -300,7 +300,7 @@ const EX={
   steps:['Banco casi vertical con respaldo.','Empezá con las mancuernas frente a la cara y las palmas mirándote.','Mientras empujás hacia arriba, girá las palmas hacia adelante.','Bajá deshaciendo el giro.'],
   err:['Arquear la espalda.','Hacerlo rápido.'],
   back:'Igual que en el press de hombros: espalda pegada al respaldo.'},
- martillo:{n:'Curl martillo',fig:'biceps',m:'Bíceps y antebrazo',r:'10–12',top:12,rest:60,q:'curl martillo con mancuernas técnica',
+ martillo:{alt:['biceps','curl_polea'],n:'Curl martillo',fig:'biceps',m:'Bíceps y antebrazo',r:'10–12',top:12,rest:60,q:'curl martillo con mancuernas técnica',
   steps:['Mancuernas con las palmas enfrentadas, como si sostuvieras un martillo.','Codos pegados al cuerpo.','Subí sin girar la muñeca.','Bajá en 2 segundos.'],
   err:['Balancear el cuerpo.','Mover los codos hacia adelante.'],
   back:'Sentado en un banco con respaldo la espalda queda quieta.'},
@@ -308,7 +308,7 @@ const EX={
   steps:['Polea baja con barra o soga.','Parate cerca de la máquina, con los codos pegados al cuerpo.','Subí hasta el pecho sin mover los codos.','Bajá lento: la polea mantiene la tensión en todo el recorrido.'],
   err:['Inclinarte hacia atrás.','Despegar los codos.'],
   back:'Con un pie un poco adelante tenés estabilidad sin arquear la espalda.'},
- frances:{n:'Extensión de tríceps sobre la cabeza',m:'Tríceps',r:'10–12',top:12,rest:60,q:'extensión de tríceps con mancuerna sentado sobre la cabeza',
+ frances:{alt:['triceps','press_cerrado'],n:'Extensión de tríceps sobre la cabeza',m:'Tríceps',r:'10–12',top:12,rest:60,q:'extensión de tríceps con mancuerna sentado sobre la cabeza',
   steps:['Sentado en un banco con respaldo, agarrá una mancuerna con las dos manos.','Subila por encima de la cabeza.','Bajala por detrás de la cabeza doblando solo los codos.','Volvé a estirar los brazos.'],
   err:['Abrir mucho los codos.','Arquear la espalda.'],
   back:'Sentado con respaldo y el abdomen firme. No lo hagas de pie.'},
@@ -343,7 +343,7 @@ const EX={
 };
 const DAYS={
  1:{focus:'Goblet · Polea al pecho · Hip thrust',ex:['goblet','jalon','inclinado','remo_unilateral','hipthrust','laterales','biceps','triceps','lateral_plank']},
- 2:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','laterales','femoral','plancha']},
+ 2:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','laterales','femoral','martillo','frances','plancha']},
  3:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','femoral','facepull','gemelos','deadbug']}
 };
 const WARMUP=['5 min de bici o cinta suave','Gato-camello: 8 repeticiones lentas','Bird dog: 2 × 6 por lado, aguantando 5 s','Puente de glúteos: 2 × 12'];
@@ -401,7 +401,7 @@ const MEALS={
 /* ---------- Estado ---------- */
 const KEY='mi-gym-v1';
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-const defaults=()=>({profile:{age:30,sex:'m',weight:75,height:174,goal:'musculo',breakfast:true},v:3,swap:{},
+const defaults=()=>({profile:{age:30,sex:'m',weight:75,height:174,goal:'musculo',breakfast:true},v:4,swap:{},
   weights:[{d:today(),kg:75}],sessions:[],drafts:{},pick:{desayuno:0,almuerzo:0,merienda:0,cena:1},tab:'entrenar',day:null});
 let S=defaults();
 try{const r=JSON.parse(localStorage.getItem(KEY));if(r){S=Object.assign(defaults(),r);if((r.v||0)<3)migrate()}}catch(e){}
@@ -414,6 +414,10 @@ function migrate(){ // los días A, B y C pasaron a llamarse 2, 1 y 3
 }
 if(!S.v){S.profile.breakfast=true;S.v=2}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+if(S.v<4){ // el Día 2 sumó dos ejercicios antes de la plancha
+  if(S.swap['2-6']){S.swap['2-8']=S.swap['2-6'];delete S.swap['2-6']}
+  S.v=4;save();
+}
 
 const $=s=>document.querySelector(s);
 const nf=(n,d=0)=>Number(n).toLocaleString('es-AR',{maximumFractionDigits:d});
