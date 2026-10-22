@@ -239,15 +239,15 @@ const EX={
   steps:['Apoyá el antebrazo con el codo debajo del hombro.','Cuerpo recto, cadera arriba.','Aguantá y después cambiá de lado.'],
   err:['Dejar caer la cadera.','Girar el torso hacia el piso.'],
   back:'Es uno de los tres ejercicios de McGill para la espalda. Versión fácil: con las rodillas apoyadas.'},
- split:{alt:['goblet','prensa'],n:'Estocada fija con mancuernas',m:'Cuádriceps y glúteos',r:'8 por pierna',top:8,rest:90,q:'split squat con mancuernas técnica',
+ split:{alt:['goblet','prensa'],n:'Estocada fija con mancuernas',m:'Cuádriceps y glúteos',r:'8 por pierna',top:8,rest:90,sets:4,q:'split squat con mancuernas técnica',
   steps:['Un pie adelante y otro atrás, como una estocada pero sin moverte.','Mancuernas a los costados.','Bajá la rodilla de atrás casi hasta el piso, con el torso recto.','Subí empujando con el pie de adelante.'],
   err:['Rodilla de adelante que se va hacia adentro.','Paso demasiado corto.'],
   back:'Con el torso vertical y las mancuernas a los costados, la columna carga mucho menos que con barra. Agarrate de algo si te falta equilibrio.'},
- remo_polea:{alt:['remo_apoyado','remo_unilateral'],n:'Remo en polea baja',m:'Espalda media',r:'10',top:10,rest:90,q:'remo en polea baja sentado técnica',
+ remo_polea:{alt:['remo_apoyado','remo_unilateral'],n:'Remo en polea baja',m:'Espalda media',r:'10',top:10,rest:90,sets:4,q:'remo en polea baja sentado técnica',
   steps:['Sentado, pies apoyados y rodillas apenas flexionadas.','Torso firme y quieto.','Llevá el agarre hacia el abdomen juntando los omóplatos.','Volvé controlado.'],
   err:['Balancear el torso adelante y atrás.','Redondear la espalda al estirar.'],
   back:'El torso no se mueve: solo trabajan los brazos y los omóplatos.'},
- press_maquina:{alt:['banca','inclinado'],n:'Press de pecho en máquina',m:'Pecho y tríceps',r:'10',top:10,rest:75,q:'press de pecho en máquina técnica',
+ press_maquina:{alt:['banca','inclinado'],n:'Press de pecho en máquina',m:'Pecho y tríceps',r:'10',top:10,rest:75,sets:4,q:'press de pecho en máquina técnica',
   steps:['Ajustá el asiento para que los agarres queden a la altura del pecho.','Espalda apoyada en el respaldo.','Empujá sin trabar los codos y volvé lento.'],
   err:['Despegar la espalda.','Asiento muy alto o muy bajo.'],
   back:'La máquina te da estabilidad. Espalda siempre contra el respaldo.'},
@@ -304,7 +304,7 @@ const EX={
   steps:['Mancuernas con las palmas enfrentadas, como si sostuvieras un martillo.','Codos pegados al cuerpo.','Subí sin girar la muñeca.','Bajá en 2 segundos.'],
   err:['Balancear el cuerpo.','Mover los codos hacia adelante.'],
   back:'Sentado en un banco con respaldo la espalda queda quieta.'},
- curl_polea:{n:'Curl de bíceps en polea',m:'Bíceps',r:'10–12',top:12,rest:60,q:'curl de bíceps en polea baja técnica',
+ curl_polea:{alt:['biceps','martillo'],n:'Curl de bíceps en polea',m:'Bíceps',r:'10–12',top:12,rest:60,q:'curl de bíceps en polea baja técnica',
   steps:['Polea baja con barra o soga.','Parate cerca de la máquina, con los codos pegados al cuerpo.','Subí hasta el pecho sin mover los codos.','Bajá lento: la polea mantiene la tensión en todo el recorrido.'],
   err:['Inclinarte hacia atrás.','Despegar los codos.'],
   back:'Con un pie un poco adelante tenés estabilidad sin arquear la espalda.'},
@@ -344,7 +344,7 @@ const EX={
 const DAYS={
  1:{focus:'Goblet · Polea al pecho · Hip thrust',ex:['goblet','jalon','inclinado','remo_unilateral','hipthrust','laterales','biceps','triceps','lateral_plank']},
  2:{focus:'Prensa · Banco · Remo',ex:['prensa','banca','remo_apoyado','hombro','laterales','femoral','martillo','frances','plancha']},
- 3:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','femoral','facepull','gemelos','deadbug']}
+ 3:{focus:'Estocada · Remo en polea · Face pull',ex:['split','remo_polea','press_maquina','cuadriceps','femoral','facepull','gemelos','curl_polea','deadbug']}
 };
 const WARMUP=['5 min de bici o cinta suave','Gato-camello: 8 repeticiones lentas','Bird dog: 2 × 6 por lado, aguantando 5 s','Puente de glúteos: 2 × 12'];
 
@@ -401,7 +401,7 @@ const MEALS={
 /* ---------- Estado ---------- */
 const KEY='mi-gym-v1';
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
-const defaults=()=>({profile:{age:30,sex:'m',weight:75,height:174,goal:'musculo',breakfast:true},v:4,swap:{},
+const defaults=()=>({profile:{age:30,sex:'m',weight:75,height:174,goal:'musculo',breakfast:true},v:5,swap:{},
   weights:[{d:today(),kg:75}],sessions:[],drafts:{},pick:{desayuno:0,almuerzo:0,merienda:0,cena:1},tab:'entrenar',day:null});
 let S=defaults();
 try{const r=JSON.parse(localStorage.getItem(KEY));if(r){S=Object.assign(defaults(),r);if((r.v||0)<3)migrate()}}catch(e){}
@@ -417,6 +417,10 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 if(S.v<4){ // el Día 2 sumó dos ejercicios antes de la plancha
   if(S.swap['2-6']){S.swap['2-8']=S.swap['2-6'];delete S.swap['2-6']}
   S.v=4;save();
+}
+if(S.v<5){ // el Día 3 sumó el curl en polea antes del dead bug
+  if(S.swap['3-7']){S.swap['3-8']=S.swap['3-7'];delete S.swap['3-7']}
+  S.v=5;save();
 }
 
 const $=s=>document.querySelector(s);
