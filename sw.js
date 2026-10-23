@@ -1,5 +1,5 @@
 // Guarda la app en el teléfono para que funcione sin internet.
-const CACHE='mi-gym-v11';
+const CACHE='mi-gym-v12';
 const FILES=['./','index.html','figuras.js','manifest.webmanifest','icon-180.png','icon-192.png','icon-512.png',
   'fonts/archivo.woff2','fonts/barlow-600.woff2','fonts/barlow-700.woff2'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(f=>new Request(f,{cache:'reload'})))).then(()=>self.skipWaiting()))});
