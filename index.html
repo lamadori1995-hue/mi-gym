@@ -61,6 +61,7 @@ button{cursor:pointer}
 .btn.danger{background:transparent;border:1px solid var(--warn);color:var(--warn)}
 .btn:disabled{opacity:.45;cursor:default}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.music{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
 .grow{flex:1;min-width:0}
 a{color:var(--accent-text)}
 
@@ -413,6 +414,9 @@ function migrate(){ // los días A, B y C pasaron a llamarse 2, 1 y 3
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
 }
 if(!S.v){S.profile.breakfast=true;S.v=2}
+const MUSIC_RE=/^https:\/\/((music|www|m)\.)?youtube\.com\/[^\s"'<>]*$|^https:\/\/youtu\.be\/[^\s"'<>]*$/;
+if(typeof S.music!=='string'||!MUSIC_RE.test(S.music))S.music='';
+const musicUrl=()=>S.music||'https://music.youtube.com/';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 if(S.v<4){ // el Día 2 sumó dos ejercicios antes de la plancha
   if(S.swap['2-6']){S.swap['2-8']=S.swap['2-6'];delete S.swap['2-6']}
@@ -511,6 +515,7 @@ function renderTrain(){
   const day=curDay(),d=draft(day),nd=nextDay();
   const anyDone=Object.values(d.sets).some(a=>a.some(s=>s.done));
   let h=`<header class="page"><span class="eyebrow">3 días por semana · cuerpo completo · cuidando la lumbar</span><h1>Entrenar</h1></header>
+  <a class="btn ghost music" href="${musicUrl()}" target="_blank" rel="noopener">🎵 ${S.music?'Abrir tu playlist':'Abrir YouTube Music'}</a>
   <div class="days" role="group" aria-label="Elegí el día">${['1','2','3'].map(k=>`<button class="day${k===day?' on':''}" data-day="${k}">
      <span class="tag">${k===nd?'Te toca':'&nbsp;'}</span><b>Día ${k}</b><span>${DAYS[k].focus}</span></button>`).join('')}</div>
   <details class="note"><summary>Reglas para tu espalda</summary><ul>
@@ -631,6 +636,9 @@ function renderProfile(){
       <option value="grasa" ${p.goal==='grasa'?'selected':''}>Bajar grasa (−400 kcal)</option>
       <option value="mantener" ${p.goal==='mantener'?'selected':''}>Mantenerme</option></select></label>
   </form>
+  <section class="panel"><h2>Música</h2>
+    <div class="form"><label class="full">Link de tu playlist de YouTube Music<input id="m-link" inputmode="url" autocomplete="off" placeholder="https://music.youtube.com/playlist?list=…" value="${S.music}"></label></div>
+    <p class="fine">En YouTube Music tocá ⋯ en la playlist › Compartir › Copiar vínculo, y pegalo acá. Si lo dejás vacío, el botón de Entrenar abre YouTube Music sin playlist.</p></section>
   <section class="panel"><div class="kv">
     <div class="stat"><b>${nf(c.imc,1)}</b><span>IMC · ${cat}</span></div>
     <div class="stat"><b>${nf(c.tdee)}</b><span>kcal que gastás por día</span></div>
@@ -650,7 +658,9 @@ function render(){
 document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;S.tab=b.dataset.tab;save();render();scrollTo(0,0)});
 
 let audio;
-function beep(){try{audio=audio||new (window.AudioContext||window.webkitAudioContext)();[0,.25,.5].forEach(o=>{const g=audio.createGain(),os=audio.createOscillator();os.frequency.value=880;g.gain.setValueAtTime(.2,audio.currentTime+o);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+o+.2);os.connect(g).connect(audio.destination);os.start(audio.currentTime+o);os.stop(audio.currentTime+o+.2)})}catch(e){}}
+// "transient" hace que el pitido baje un momento la música de YouTube Music en vez de pausarla.
+function newAudio(){if(navigator.audioSession)try{navigator.audioSession.type='transient'}catch(e){}return new (window.AudioContext||window.webkitAudioContext)()}
+function beep(){try{audio=audio||newAudio();audio.resume();setTimeout(()=>audio.suspend(),900);[0,.25,.5].forEach(o=>{const g=audio.createGain(),os=audio.createOscillator();os.frequency.value=880;g.gain.setValueAtTime(.2,audio.currentTime+o);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+o+.2);os.connect(g).connect(audio.destination);os.start(audio.currentTime+o);os.stop(audio.currentTime+o+.2)})}catch(e){}}
 const R={end:0,iv:null};
 function restDraw(){
   const el=$('#rest'),left=Math.max(0,Math.ceil((R.end-Date.now())/1000));
@@ -658,7 +668,7 @@ function restDraw(){
     <button data-rest="-15">−15</button><button data-rest="15">+15</button><button data-rest="0">Listo</button></div>`;
   if(!left){clearInterval(R.iv);R.iv=null;beep();setTimeout(()=>{if(!R.iv)el.hidden=true},4000)}
 }
-function startRest(sec){try{audio=audio||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}
+function startRest(sec){try{if(!audio){audio=newAudio();audio.suspend()}}catch(e){}
   R.end=Date.now()+sec*1000;$('#rest').hidden=false;clearInterval(R.iv);R.iv=setInterval(restDraw,250);restDraw()}
 $('#rest').addEventListener('click',e=>{const b=e.target.closest('[data-rest]');if(!b)return;const v=+b.dataset.rest;
   if(!v){clearInterval(R.iv);R.iv=null;$('#rest').hidden=true}else{R.end=Math.max(Date.now(),R.end+v*1000);if(!R.iv)R.iv=setInterval(restDraw,250);restDraw()}});
@@ -670,6 +680,7 @@ const app=$('#app');
 app.addEventListener('input',e=>{
   const inp=e.target;
   if(inp.dataset.f){const row=inp.closest('.set'),d=draft(curDay());d.sets[row.dataset.id][+row.dataset.i][inp.dataset.f]=inp.value.replace(',','.');save();return}
+  if(inp.id==='m-link'){const v=inp.value.trim();if(!v||MUSIC_RE.test(v)){S.music=v;save()}return}
   if(inp.id&&inp.id.startsWith('p-')){
     const p=S.profile,k=inp.id.slice(2),v=inp.value.replace(',','.');
     if(k==='sex'||k==='goal')p[k]=v;else if(+v>0)p[k]=+v;else return;
