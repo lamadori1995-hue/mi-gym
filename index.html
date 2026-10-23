@@ -117,6 +117,20 @@ dialog#sheet::backdrop{background:rgba(0,0,0,.55)}
 .back{border-left:3px solid var(--plate);padding:4px 0 4px 10px}
 .finish{display:flex;flex-direction:column;gap:8px}
 
+/* reproductor de música */
+#player{position:fixed;left:0;right:0;bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px));z-index:20;
+  padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));background:var(--surface);border-top:1px solid var(--line)}
+#player .in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:12px}
+#player .vid{width:128px;height:72px;flex:none;border-radius:8px;overflow:hidden;background:#000}
+#player .vid iframe{width:100%;height:100%;display:block;border:0}
+#player .info{min-width:0;display:flex;flex-direction:column;gap:6px}
+#player .ttl{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#player .ctl{display:flex;gap:8px}
+#player button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;width:46px;height:38px;display:grid;place-items:center;padding:0}
+#player button svg{width:18px;height:18px;fill:currentColor}
+#player button.x{border:0;width:34px;align-self:flex-start}
+body.playing #toast{bottom:calc(var(--tabh) + 104px + env(safe-area-inset-bottom,0px))}
+
 /* pestañas */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
   padding:0 max(8px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(8px,env(safe-area-inset-left,0px))}
@@ -165,6 +179,12 @@ nav.tabs button.on svg{stroke:var(--accent-text)}
 <body>
 <main id="app"></main>
 <div id="toast" hidden></div>
+<div id="player" hidden><div class="in"><div class="vid"><div id="yt"></div></div>
+  <div class="grow info"><span class="ttl" id="pl-t"></span><div class="ctl">
+    <button data-pl="prev" aria-label="Tema anterior"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+    <button data-pl="play" aria-label="Pausar o seguir"></button>
+    <button data-pl="next" aria-label="Tema siguiente"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button></div></div>
+  <button class="x" data-pl="close" aria-label="Cerrar la música"><svg viewBox="0 0 24 24"><path d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4z"/></svg></button></div></div>
 <dialog id="sheet" aria-label="Cómo se hace"></dialog>
 <nav class="tabs" aria-label="Secciones"><div class="in">
   <button data-tab="entrenar"><svg viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></svg>Entrenar</button>
@@ -409,6 +429,7 @@ if(!S.v){S.profile.breakfast=true;S.v=2}
 const MUSIC_RE=/^https:\/\/((music|www|m)\.)?youtube\.com\/[^\s"'<>]*$|^https:\/\/youtu\.be\/[^\s"'<>]*$/;
 if(typeof S.music!=='string'||!MUSIC_RE.test(S.music))S.music='';
 const musicUrl=()=>S.music||'https://music.youtube.com/';
+const listId=()=>{try{return new URL(S.music).searchParams.get('list')||''}catch(e){return ''}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 if(S.v<4){ // el Día 2 sumó dos ejercicios antes de la plancha
   if(S.swap['2-6']){S.swap['2-8']=S.swap['2-6'];delete S.swap['2-6']}
@@ -507,7 +528,9 @@ function renderTrain(){
   const day=curDay(),d=draft(day),nd=nextDay();
   const anyDone=Object.values(d.sets).some(a=>a.some(s=>s.done));
   let h=`<header class="page"><span class="eyebrow">3 días por semana · cuerpo completo · cuidando la lumbar</span><h1>Entrenar</h1></header>
-  <a class="btn ghost music" href="${musicUrl()}" target="_blank" rel="noopener">🎵 ${S.music?'Abrir tu playlist':'Abrir YouTube Music'}</a>
+  ${listId()?`<div class="row"><button class="btn primary grow" data-act="music">🎵 Escuchar acá</button>
+    <a class="btn ghost music" href="${musicUrl()}" target="_blank" rel="noopener">Abrir en YouTube Music</a></div>`
+  :`<a class="btn ghost music" href="${musicUrl()}" target="_blank" rel="noopener">🎵 Abrir YouTube Music</a>`}
   <div class="days" role="group" aria-label="Elegí el día">${['1','2','3'].map(k=>`<button class="day${k===day?' on':''}" data-day="${k}">
      <span class="tag">${k===nd?'Te toca':'&nbsp;'}</span><b>Día ${k}</b><span>${DAYS[k].focus}</span></button>`).join('')}</div>
   <details class="note"><summary>Reglas para tu espalda</summary><ul>
@@ -652,6 +675,31 @@ document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target
 let wake=null;
 async function keepAwake(){if(wake||!navigator.wakeLock)return;try{wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>wake=null)}catch(e){}}
 
+/* ---------- Música dentro de la app (reproductor de YouTube) ---------- */
+let YTP=null,plList='',ytReady=null;
+function loadYT(){return ytReady||(ytReady=new Promise((ok,ko)=>{window.onYouTubeIframeAPIReady=ok;
+  const sc=document.createElement('script');sc.src='https://www.youtube.com/iframe_api';sc.onerror=()=>{ytReady=null;sc.remove();ko()};document.head.appendChild(sc)}))}
+const plT=t=>$('#pl-t').textContent=t;
+function plIcon(on){$('[data-pl="play"]').innerHTML=on?'<svg viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>':'<svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>'}
+async function startPlayer(){
+  const id=listId();if(!id)return;
+  $('#player').hidden=false;document.body.classList.add('playing');keepAwake();
+  if(YTP){if(plList!==id){plList=id;YTP.loadPlaylist({list:id,listType:'playlist'})}else YTP.playVideo();return}
+  plIcon(false);plT('Cargando…');
+  try{await loadYT()}catch(e){plT('Sin internet: no se pudo cargar la música');return}
+  plList=id;
+  YTP=new YT.Player('yt',{width:'128',height:'72',playerVars:{listType:'playlist',list:id,playsinline:1,autoplay:1,rel:0},events:{
+    onReady:e=>{e.target.playVideo();setTimeout(()=>{if(YTP.getPlayerState()!==1)plT('Tocá el video para arrancar')},2500)},
+    onStateChange:e=>{plIcon(e.data===1);if(e.data===1){const d=YTP.getVideoData();plT(d&&d.title||'Sonando')}},
+    // algunos temas no dejan pasarse fuera de YouTube: se saltean solos
+    onError:e=>{if(e.data===2){plT('No se pudo abrir la playlist. Usá “Abrir en YouTube Music”.');return}plT('Ese tema no se puede pasar acá, salto al siguiente');YTP.nextVideo()}}});
+}
+$('#player').addEventListener('click',e=>{const b=e.target.closest('[data-pl]');if(!b)return;const a=b.dataset.pl;
+  if(a==='close'){if(YTP&&YTP.pauseVideo)YTP.pauseVideo();$('#player').hidden=true;document.body.classList.remove('playing');return}
+  if(!YTP||!YTP.getPlayerState)return;
+  if(a==='prev')YTP.previousVideo();else if(a==='next')YTP.nextVideo();else YTP.getPlayerState()===1?YTP.pauseVideo():YTP.playVideo()});
+if(listId())loadYT().catch(()=>{});
+
 const app=$('#app');
 app.addEventListener('input',e=>{
   const inp=e.target;
@@ -702,6 +750,7 @@ app.addEventListener('click',e=>{
   if(sw){const k=sw.dataset.swap;S.pick[k]=((S.pick[k]||0)+1)%MEALS[k].opts.length;save();render();return}
   const b=e.target.closest('[data-act]');if(!b)return;
   const act=b.dataset.act,day=curDay();
+  if(act==='music'){startPlayer();return}
   if(act==='done'){
     const row=b.closest('.set'),id=row.dataset.id,i=+row.dataset.i,s=draft(day).sets[id][i];
     s.done=!s.done;
