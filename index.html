@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Mi Gym</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -35,7 +35,7 @@
   --good:#5CC98B; --good-bg:#16301F; --warn:#F2A35E; color-scheme:dark}
 
 *{box-sizing:border-box}
-html{color-scheme:light;-webkit-text-size-adjust:100%}
+html{color-scheme:light;-webkit-text-size-adjust:100%;touch-action:manipulation} /* sin zoom al tocar dos veces */
 [hidden]{display:none!important}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
@@ -429,7 +429,7 @@ if(!S.v){S.profile.breakfast=true;S.v=2}
 const MUSIC_RE=/^https:\/\/((music|www|m)\.)?youtube\.com\/[^\s"'<>]*$|^https:\/\/youtu\.be\/[^\s"'<>]*$/;
 if(typeof S.music!=='string'||!MUSIC_RE.test(S.music))S.music='';
 const musicUrl=()=>S.music||'https://music.youtube.com/';
-const listId=()=>{try{return new URL(S.music).searchParams.get('list')||''}catch(e){return ''}};
+const listId=()=>{try{const u=new URL(S.music),m=u.pathname.match(/\/browse\/VL([\w-]+)/);return u.searchParams.get('list')||(m?m[1]:'')}catch(e){return ''}};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 if(S.v<4){ // el Día 2 sumó dos ejercicios antes de la plancha
   if(S.swap['2-6']){S.swap['2-8']=S.swap['2-6'];delete S.swap['2-6']}
@@ -776,7 +776,13 @@ app.addEventListener('click',e=>{
   if(act==='reset-no'){render();return}
 });
 render();
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+  // cuando llega una versión nueva, recarga sola para mostrarla
+  const had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload()}});
+  navigator.serviceWorker.register('sw.js').then(r=>r.update()).catch(()=>{});
+}
+var reloaded=false;
 </script>
 <script src="figuras.js"></script>
 </body>
