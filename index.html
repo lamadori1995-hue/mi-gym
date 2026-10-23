@@ -117,13 +117,6 @@ dialog#sheet::backdrop{background:rgba(0,0,0,.55)}
 .back{border-left:3px solid var(--plate);padding:4px 0 4px 10px}
 .finish{display:flex;flex-direction:column;gap:8px}
 
-/* temporizador */
-#rest{position:fixed;left:0;right:0;bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px));z-index:20;
-  padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:var(--plate);color:var(--plate-ink)}
-#rest .in{max-width:560px;margin:0 auto;display:flex;align-items:center;gap:10px}
-#rest .t{font-family:var(--display);font-size:34px;line-height:1;font-variant-numeric:tabular-nums;min-width:74px}
-#rest button{border:1px solid rgba(0,0,0,.25);background:transparent;color:var(--plate-ink);border-radius:8px;padding:7px 10px;font-weight:600}
-
 /* pestañas */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
   padding:0 max(8px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(8px,env(safe-area-inset-left,0px))}
@@ -171,7 +164,6 @@ nav.tabs button.on svg{stroke:var(--accent-text)}
 </head>
 <body>
 <main id="app"></main>
-<div id="rest" hidden></div>
 <div id="toast" hidden></div>
 <dialog id="sheet" aria-label="Cómo se hace"></dialog>
 <nav class="tabs" aria-label="Secciones"><div class="in">
@@ -542,7 +534,7 @@ function renderTrain(){
   h+=`</section><div class="finish">
     <button class="btn primary" data-act="finish" ${anyDone?'':'disabled'}>Terminar y guardar el Día ${day}</button>
     <div id="discard"><button class="btn ghost" data-act="discard" ${anyDone?'':'hidden'}>Descartar este entrenamiento</button></div>
-    <p class="fine">Al marcar ✓ arranca el descanso. Si dejás un campo vacío, se guarda el valor gris de referencia.</p></div>`;
+    <p class="fine">Si dejás un campo vacío, se guarda el valor gris de referencia.</p></div>`;
   return h;
 }
 
@@ -657,22 +649,6 @@ function render(){
 }
 document.querySelector('nav.tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;S.tab=b.dataset.tab;save();render();scrollTo(0,0)});
 
-let audio;
-// "transient" hace que el pitido baje un momento la música de YouTube Music en vez de pausarla.
-function newAudio(){if(navigator.audioSession)try{navigator.audioSession.type='transient'}catch(e){}return new (window.AudioContext||window.webkitAudioContext)()}
-function beep(){try{audio=audio||newAudio();audio.resume();setTimeout(()=>audio.suspend(),900);[0,.25,.5].forEach(o=>{const g=audio.createGain(),os=audio.createOscillator();os.frequency.value=880;g.gain.setValueAtTime(.2,audio.currentTime+o);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+o+.2);os.connect(g).connect(audio.destination);os.start(audio.currentTime+o);os.stop(audio.currentTime+o+.2)})}catch(e){}}
-const R={end:0,iv:null};
-function restDraw(){
-  const el=$('#rest'),left=Math.max(0,Math.ceil((R.end-Date.now())/1000));
-  el.innerHTML=`<div class="in"><span class="t">${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}</span><span class="grow">${left?'Descanso':'¡Próxima serie!'}</span>
-    <button data-rest="-15">−15</button><button data-rest="15">+15</button><button data-rest="0">Listo</button></div>`;
-  if(!left){clearInterval(R.iv);R.iv=null;beep();setTimeout(()=>{if(!R.iv)el.hidden=true},4000)}
-}
-function startRest(sec){try{if(!audio){audio=newAudio();audio.suspend()}}catch(e){}
-  R.end=Date.now()+sec*1000;$('#rest').hidden=false;clearInterval(R.iv);R.iv=setInterval(restDraw,250);restDraw()}
-$('#rest').addEventListener('click',e=>{const b=e.target.closest('[data-rest]');if(!b)return;const v=+b.dataset.rest;
-  if(!v){clearInterval(R.iv);R.iv=null;$('#rest').hidden=true}else{R.end=Math.max(Date.now(),R.end+v*1000);if(!R.iv)R.iv=setInterval(restDraw,250);restDraw()}});
-
 let wake=null;
 async function keepAwake(){if(wake||!navigator.wakeLock)return;try{wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>wake=null)}catch(e){}}
 
@@ -727,9 +703,9 @@ app.addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   const act=b.dataset.act,day=curDay();
   if(act==='done'){
-    const row=b.closest('.set'),id=row.dataset.id,i=+row.dataset.i,s=draft(day).sets[id][i],e2=EX[id];
+    const row=b.closest('.set'),id=row.dataset.id,i=+row.dataset.i,s=draft(day).sets[id][i];
     s.done=!s.done;
-    if(s.done){row.querySelectorAll('input').forEach(inp=>{if(!inp.value&&inp.placeholder){inp.value=inp.placeholder;s[inp.dataset.f]=inp.placeholder.replace(',','.')}});startRest(e2.rest);keepAwake()}
+    if(s.done){row.querySelectorAll('input').forEach(inp=>{if(!inp.value&&inp.placeholder){inp.value=inp.placeholder;s[inp.dataset.f]=inp.placeholder.replace(',','.')}});keepAwake()}
     save();
     b.classList.toggle('on',s.done);b.setAttribute('aria-pressed',s.done);
     $('#ex-'+id).classList.toggle('done',draft(day).sets[id].every(x=>x.done));
@@ -741,7 +717,7 @@ app.addEventListener('click',e=>{
     const d=draft(day),ex={};
     for(const id in d.sets){const done=d.sets[id].filter(s=>s.done).map(s=>({kg:+s.kg||0,reps:+s.reps||0}));if(done.length)ex[id]=done}
     S.sessions.push({d:today(),day,ex});delete S.drafts[day];S.day=null;save();
-    clearInterval(R.iv);R.iv=null;$('#rest').hidden=true;render();scrollTo(0,0);toast('Día '+day+' guardado. ¡Bien ahí!');return;
+    render();scrollTo(0,0);toast('Día '+day+' guardado. ¡Bien ahí!');return;
   }
   if(act==='discard'){$('#discard').innerHTML=`<div class="row"><span class="grow sub">¿Seguro? Se pierden las series marcadas.</span><button class="btn danger" data-act="discard-yes">Descartar</button><button class="btn ghost" data-act="discard-no">Cancelar</button></div>`;return}
   if(act==='discard-yes'){delete S.drafts[day];save();render();toast('Entrenamiento descartado');return}
