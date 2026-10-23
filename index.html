@@ -430,6 +430,7 @@ const MUSIC_RE=/^https:\/\/((music|www|m)\.)?youtube\.com\/[^\s"'<>]*$|^https:\/
 if(typeof S.music!=='string'||!MUSIC_RE.test(S.music))S.music='';
 const musicUrl=()=>S.music||'https://music.youtube.com/';
 const listId=()=>{try{const u=new URL(S.music),m=u.pathname.match(/\/browse\/VL([\w-]+)/);return u.searchParams.get('list')||(m?m[1]:'')}catch(e){return ''}};
+const musicStatus=()=>!S.music?'Todavía no pegaste ningún link.':listId()?'✓ Playlist reconocida: en Entrenar aparece “Escuchar acá”.':'Ese link no es de una playlist: solo se puede abrir en YouTube Music.';
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 if(S.v<4){ // el Día 2 sumó dos ejercicios antes de la plancha
   if(S.swap['2-6']){S.swap['2-8']=S.swap['2-6'];delete S.swap['2-6']}
@@ -653,6 +654,7 @@ function renderProfile(){
   </form>
   <section class="panel"><h2>Música</h2>
     <div class="form"><label class="full">Link de tu playlist de YouTube Music<input id="m-link" inputmode="url" autocomplete="off" placeholder="https://music.youtube.com/playlist?list=…" value="${S.music}"></label></div>
+    <p class="sub" id="m-ok">${musicStatus()}</p>
     <p class="fine">En YouTube Music tocá ⋯ en la playlist › Compartir › Copiar vínculo, y pegalo acá. Si lo dejás vacío, el botón de Entrenar abre YouTube Music sin playlist.</p></section>
   <section class="panel"><div class="kv">
     <div class="stat"><b>${nf(c.imc,1)}</b><span>IMC · ${cat}</span></div>
@@ -660,7 +662,7 @@ function renderProfile(){
     <div class="stat"><b>${nf(c.kcal)}</b><span>kcal objetivo</span></div>
     <div class="stat"><b>${c.prot} g</b><span>proteína (${S.profile.goal==='grasa'?'2,2':'2'} g/kg)</span></div></div>
     <p class="fine">Metabolismo basal de ${nf(c.bmr)} kcal (fórmula Mifflin-St Jeor) × 1,45 por entrenar 3 veces por semana. Es una estimación: si en 3–4 semanas tu peso no se mueve como esperabas, ajustá unas 150 kcal. El IMC no distingue músculo de grasa.</p></section>
-  <section class="panel"><h2>Datos guardados</h2><p class="fine">Todo se guarda solo en este teléfono. Si borrás los datos de navegación, se pierde.</p>
+  <section class="panel"><h2>Datos guardados</h2><p class="fine">Todo se guarda solo en este teléfono. Si borrás los datos de navegación, se pierde. · Versión 12</p>
     <div id="reset"><button class="btn danger" data-act="reset">Borrar todo y empezar de cero</button></div></section>`;
 }
 
@@ -704,7 +706,8 @@ const app=$('#app');
 app.addEventListener('input',e=>{
   const inp=e.target;
   if(inp.dataset.f){const row=inp.closest('.set'),d=draft(curDay());d.sets[row.dataset.id][+row.dataset.i][inp.dataset.f]=inp.value.replace(',','.');save();return}
-  if(inp.id==='m-link'){const v=inp.value.trim();if(!v||MUSIC_RE.test(v)){S.music=v;save()}return}
+  if(inp.id==='m-link'){const v=(inp.value.match(/https:\/\/\S+/)||[''])[0]; // por si se pega con texto alrededor
+    if(!inp.value.trim()||MUSIC_RE.test(v)){S.music=v;save();$('#m-ok').textContent=musicStatus()}else $('#m-ok').textContent='Ese link no es de YouTube. Copialo desde YouTube Music › Compartir.';return}
   if(inp.id&&inp.id.startsWith('p-')){
     const p=S.profile,k=inp.id.slice(2),v=inp.value.replace(',','.');
     if(k==='sex'||k==='goal')p[k]=v;else if(+v>0)p[k]=+v;else return;
